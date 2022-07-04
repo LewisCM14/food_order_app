@@ -36,6 +36,7 @@ const AvailableMeals = () => {
   // passing the data to MealItem.js in the 'meal' object as a prop.
   const mealsList = DUMMY_MEALS.map((meal) => (
     <MealItem
+      id={meal.id}
       key={meal.id}
       name={meal.name}
       description={meal.description}
