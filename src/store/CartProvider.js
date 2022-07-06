@@ -9,10 +9,37 @@ const defaultCartState = {
 
 // The function to handle updating the 'cart' state.
 const cartReducer = (state, action) => {
-  if (action.type === 'ADD') {
-    const updatedItems = state.items.concat(action.item); // an array to store the items in the cart
+  if (action.type === "ADD") {
     const updatedTotalAmount =
       state.totalAmount + action.item.price * action.item.amount; // stores the cart total
+
+    // if the item being iterated over is equal to the item being passed its index is returned
+    const existingCartItemIndex = state.items.findIndex(
+      (item) => item.id === action.item.id
+    );
+
+    // Collects the existing cart item if existingCartItemIndex returns truthy.
+    // returns null if existingCartItemIndex doesn't match the passed item to an existing item
+    const existingCartItem = state.items[existingCartItemIndex];
+    let updatedItems;
+
+    // if existingCartItem is truthy spreads the existing item into the updatedItem object
+    // then updates the amount key for the existing item to be plus the passed in item.
+    // The updatedItems object is then set to a new array where the existing cart items are spread in
+    // Then the exiting cart items index is updated via the updatedItem object.
+    // i.e. the initial cart items amount is set to the new desired value.
+    if (existingCartItem) {
+      const updatedItem = {
+        ...existingCartItem,
+        amount: existingCartItem.amount + action.item.amount,
+      };
+      updatedItems = [...state.items];
+      updatedItems[existingCartItemIndex] = updatedItem;
+    } else {
+      // if item is not found in the cart
+      updatedItems = state.items.concat(action.item); // spreads the passed item in the updatedItems object
+    }
+
     return {
       items: updatedItems,
       totalAmount: updatedTotalAmount,
