@@ -19,12 +19,16 @@ const Cart = (props) => {
   const hasItems = cartCtx.items.length > 0;
 
   // Function to remove items from the cart, passed to CartItem.js in the onRemove prop.
-  // id argument is bound in the prop pointer.
-  const cartItemRemoveHandler = (id) => {};
+  // id argument is bound in the prop pointer. calls the removeItem object found in cart-context.js
+  const cartItemRemoveHandler = (id) => {
+    cartCtx.removeItem(id);
+  };
 
   // Function to add items to the cart, passed to CartItem.js in the onAdd prop.
-  // item argument is bound in the prop pointer.
-  const cartItemAddHandler = (item) => {};
+  // item argument is bound in the prop pointer. calls the addItem object found in cart-context.js
+  const cartItemAddHandler = (item) => {
+    cartCtx.addItem({...item, amount: 1});
+  };
 
   // A helper function to map over the items located in the cart
   const cartItems = (
