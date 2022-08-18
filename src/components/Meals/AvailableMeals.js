@@ -1,40 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import Card from '../UI/Card';
 import MealItem from './MealItem/MealItem';
 import classes from './AvailableMeals.module.css';
 
-const DUMMY_MEALS = [
-  {
-    id: "m1",
-    name: "Sushi",
-    description: "Finest fish and veggies",
-    price: 22.99,
-  },
-  {
-    id: "m2",
-    name: "Schnitzel",
-    description: "A german specialty!",
-    price: 16.5,
-  },
-  {
-    id: "m3",
-    name: "Barbecue Burger",
-    description: "American, raw, meaty",
-    price: 12.99,
-  },
-  {
-    id: "m4",
-    name: "Green Bowl",
-    description: "Healthy...and green...",
-    price: 18.99,
-  },
-];
-
 const AvailableMeals = () => {
-  // A helper function, maps over the DUMMY_MEALS array,
+  // meals state
+  const [meals, setMeals] = useState([]);
+
+  /**
+   * fetchMeals is an async function, stores the HTTP GET request to firebase in the response,
+   * once the promise is returned awaits the JSON data, then stored in responseData.
+   * 
+   * initializes the loadedMeals array, before reaching into the responseData JSON object
+   * for each key pushing the key: value from responseData to loadedMeals transforming the data
+   * this array is then passed to the meals state object above
+   * 
+   * effect hook has no dependencies, causing to only run on initial load
+   */
+  useEffect(() => {
+    const fetchMeals = async () => {
+      const response = await fetch("https://meals-app-d0e44-default-rtdb.firebaseio.com/meals.json");
+      const responseData = await response.json();
+
+      const loadedMeals = [];
+
+      for (const key in responseData) {
+        loadedMeals.push({
+            id: key,
+            name: responseData[key].name,
+            description: responseData[key].description,
+            price: responseData[key].price,
+        })
+      }
+
+      setMeals(loadedMeals);
+    };
+    fetchMeals();
+  }, []);
+
+  // A helper function, maps over the meals state object,
   // passing the data to MealItem.js in the 'meal' object as a prop.
-  const mealsList = DUMMY_MEALS.map((meal) => (
+  const mealsList = meals.map((meal) => (
     <MealItem
       id={meal.id}
       key={meal.id}
@@ -46,9 +53,9 @@ const AvailableMeals = () => {
 
   return (
     <section className={classes.meals}>
-        <Card>
-            <ul>{mealsList}</ul>
-        </Card>
+      <Card>
+        <ul>{mealsList}</ul>
+      </Card>
     </section>
   );
 };
