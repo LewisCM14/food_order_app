@@ -5,8 +5,9 @@ import MealItem from './MealItem/MealItem';
 import classes from './AvailableMeals.module.css';
 
 const AvailableMeals = () => {
-  // meals state
+  // meals & loading state
   const [meals, setMeals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   /**
    * fetchMeals is an async function, stores the HTTP GET request to firebase in the response,
@@ -35,9 +36,20 @@ const AvailableMeals = () => {
       }
 
       setMeals(loadedMeals);
+      setIsLoading(false);
     };
     fetchMeals();
   }, []);
+
+
+  // loading state display
+  if (isLoading) {
+    return (
+      <section className={classes.MealsLoading}>
+        <p>Loading...</p>
+      </section>
+    );
+  }
 
   // A helper function, maps over the meals state object,
   // passing the data to MealItem.js in the 'meal' object as a prop.
