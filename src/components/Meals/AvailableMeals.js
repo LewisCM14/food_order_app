@@ -1,52 +1,72 @@
 import React, { useEffect, useState } from "react";
 
-import Card from '../UI/Card';
-import MealItem from './MealItem/MealItem';
-import classes from './AvailableMeals.module.css';
+import Card from "../UI/Card";
+import MealItem from "./MealItem/MealItem";
+import classes from "./AvailableMeals.module.css";
 
 const AvailableMeals = () => {
-  // meals & loading state
+  // meals & loading/error state
   const [meals, setMeals] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [httpError, setHttpError] = useState();
 
   /**
    * fetchMeals is an async function, stores the HTTP GET request to firebase in the response,
    * once the promise is returned awaits the JSON data, then stored in responseData.
-   * 
+   *
    * initializes the loadedMeals array, before reaching into the responseData JSON object
    * for each key pushing the key: value from responseData to loadedMeals transforming the data
    * this array is then passed to the meals state object above
-   * 
+   *
    * effect hook has no dependencies, causing to only run on initial load
    */
   useEffect(() => {
     const fetchMeals = async () => {
-      const response = await fetch("https://meals-app-d0e44-default-rtdb.firebaseio.com/meals.json");
+      const response = await fetch(
+        "https://meals-app-d0e44-default-rtdb.firebaseio.com/meals.json"
+      );
+
+      // if GET fails throws error
+      if (!response.ok) {
+        throw new Error("Something went wrong!");
+      }
+
       const responseData = await response.json();
 
       const loadedMeals = [];
 
       for (const key in responseData) {
         loadedMeals.push({
-            id: key,
-            name: responseData[key].name,
-            description: responseData[key].description,
-            price: responseData[key].price,
-        })
+          id: key,
+          name: responseData[key].name,
+          description: responseData[key].description,
+          price: responseData[key].price,
+        });
       }
 
       setMeals(loadedMeals);
       setIsLoading(false);
     };
-    fetchMeals();
+    fetchMeals().catch((error) => {
+      setIsLoading(false);
+      setHttpError(error.message);
+    });
   }, []);
-
 
   // loading state display
   if (isLoading) {
     return (
       <section className={classes.MealsLoading}>
         <p>Loading...</p>
+      </section>
+    );
+  }
+
+  // HTTP error state display
+  if (httpError) {
+    return (
+      <section className={classes.MealsError}>
+        <p>{httpError}</p>
       </section>
     );
   }
