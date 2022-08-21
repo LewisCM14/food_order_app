@@ -1,15 +1,15 @@
 import React, { useContext, useState } from "react";
 
-import Modal from '../UI/Modal';
+import Modal from "../UI/Modal";
 import CartItem from "./CartItem";
 import classes from "./Cart.module.css";
-import CartContext from '../../store/cart-context';
+import CartContext from "../../store/cart-context";
 import Checkout from "./Checkout";
 
 const Cart = (props) => {
   // cart checkout state
   const [isCheckout, setIsCheckout] = useState(false);
-  
+
   // Stores the data from the CartContext component in a object
   const cartCtx = useContext(CartContext);
 
@@ -30,13 +30,26 @@ const Cart = (props) => {
   // Function to add items to the cart, passed to CartItem.js in the onAdd prop.
   // item argument is bound in the prop pointer. calls the addItem object found in cart-context.js
   const cartItemAddHandler = (item) => {
-    cartCtx.addItem({...item, amount: 1});
+    cartCtx.addItem({ ...item, amount: 1 });
   };
 
   // function to trigger the Checkout.js form display, points at the isCheckout state above
-const orderHandler = () => {
+  const orderHandler = () => {
     setIsCheckout(true);
-};
+  };
+
+  // submits the order to the firebase orders node,
+  // collects the userData for the user field from Checkout.js via the onConfirm prop
+  // collects orderedItems data from cartCtx below.
+  const submitOrderHandler = (userData) => {
+    fetch('https://meals-app-d0e44-default-rtdb.firebaseio.com/orders.json', {
+        method: 'POST',
+        body: JSON.stringify({
+            user: userData,
+            orderedItems: cartCtx.items
+        })
+    })
+  };
 
   // A helper function to map over the items located in the cart
   const cartItems = (
@@ -69,12 +82,14 @@ const orderHandler = () => {
       )}
     </div>
   );
-  
+
   /**
    * core checkout modal
    * uses the isCheckout state above to dynamically render
    * Checkout.js receives the onClose prop from App.js,
    * which points at the hideCartHandler function.
+   * onConfirm prop receives the submitOrderHandler above,
+   * passes it to Checkout.js to the confirmHandler.
    */
 
   return (
@@ -84,7 +99,7 @@ const orderHandler = () => {
         <span>Total Amount</span>
         <span>{totalAmount}</span>
       </div>
-      {isCheckout && <Checkout onCancel={props.onClose} />}
+      {isCheckout && <Checkout onConfirm={submitOrderHandler} onCancel={props.onClose} />}
       {!isCheckout && modalActions}
     </Modal>
   );

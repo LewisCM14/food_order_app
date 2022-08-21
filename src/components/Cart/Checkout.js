@@ -60,6 +60,15 @@ const Checkout = (props) => {
     if (!formIsValid) {
       return;
     }
+
+    // passes the userData to Cart.js for use in submitOrderHandler.
+    props.onConfirm({
+        name: enteredName,
+        street: enteredStreet,
+        city: enteredCity,
+        postalCode: enteredPostalCode,
+    });
+
   };
 
   // form control class rendering
