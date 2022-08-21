@@ -68,6 +68,10 @@ const cartReducer = (state, action) => {
     };
   }
 
+  if (action.type === "CLEAR") {
+    return defaultCartState;
+  }
+
   return defaultCartState;
 };
 
@@ -86,7 +90,7 @@ const CartProvider = (props) => {
   // Sets the type/action to ADD and forwards the received item argument to cartReducer.
   const addItemToCartHandler = (item) => {
     dispatchCartAction({
-      type: 'ADD',
+      type: "ADD",
       item: item,
     });
   };
@@ -95,9 +99,14 @@ const CartProvider = (props) => {
   // Sets the type/action to REMOVE and forwards the received id argument to cartReducer.
   const removeItemFromCartHandler = (id) => {
     dispatchCartAction({
-      type: 'REMOVE',
+      type: "REMOVE",
       id: id,
     });
+  };
+
+  // Clears the cart content on order submission
+  const clearCartHandler = () => {
+    dispatchCartAction({type: 'CLEAR'})
   };
 
   const cartContext = {
@@ -105,6 +114,7 @@ const CartProvider = (props) => {
     totalAmount: cartState.totalAmount,
     addItem: addItemToCartHandler,
     removeItem: removeItemFromCartHandler,
+    clearCart: clearCartHandler,
   };
 
   return (
