@@ -3,8 +3,19 @@ import React from "react";
 import classes from './Checkout.module.css';
 
 const Checkout = (props) => {
+    /**
+     * Confirm Checkout function, prevents default on from submit
+     * 
+     */
+
+    const confirmHandler = (event) => {
+        event.preventDefault();
+    };
+
+    // Checkout form, receives the onCancel prop from Cart.js,
+    //which points at the hideCartHandler in App.js
     return (
-        <form>
+        <form onSubmit={confirmHandler}>
             <div className={classes.control}>
                 <label htmlFor="name">Your Name</label>
                 <input type='text' id='name' />
@@ -21,6 +32,7 @@ const Checkout = (props) => {
                 <label htmlFor="city">City</label>
                 <input type='text' id='city' />
             </div>
+            <button type='button' onClick={props.onCancel}>Cancel</button>
             <button>Confirm</button>
         </form>
     );

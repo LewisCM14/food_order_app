@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, { useContext, useState } from "react";
 
 import Modal from '../UI/Modal';
 import CartItem from "./CartItem";
@@ -7,6 +7,8 @@ import CartContext from '../../store/cart-context';
 import Checkout from "./Checkout";
 
 const Cart = (props) => {
+  // cart checkout state
+  const [isCheckout, setIsCheckout] = useState(false);
   
   // Stores the data from the CartContext component in a object
   const cartCtx = useContext(CartContext);
@@ -31,6 +33,11 @@ const Cart = (props) => {
     cartCtx.addItem({...item, amount: 1});
   };
 
+  // function to trigger the Checkout.js form display, points at the isCheckout state above
+const orderHandler = () => {
+    setIsCheckout(true);
+};
+
   // A helper function to map over the items located in the cart
   const cartItems = (
     <ul className={classes["cart-items"]}>
@@ -46,13 +53,28 @@ const Cart = (props) => {
       ))}
     </ul>
   );
+
+  // modal content, requires an onClose prop,
+  // in this instance that prop points at the onClose prop found in Apps.js.
+  // This onClose prop triggers the hideCartHandler method.
+  const modalActions = (
+    <div className={classes.actions}>
+      <button className={classes["button--alt"]} onClick={props.onClose}>
+        Close
+      </button>
+      {hasItems && (
+        <button className={classes.button} onClick={orderHandler}>
+          Order
+        </button>
+      )}
+    </div>
+  );
   
   /**
-   * Receives the onClose prop passed from Apps.js,
-   * This prop points at the hideCartHandler function found in Apps.js.
-   * The Modal component requires an onClose prop,
-   * in this instance that prop points at the onClose prop found in Apps.js.
-   * This onClose prop triggers the hideCartHandler method.
+   * core checkout modal
+   * uses the isCheckout state above to dynamically render
+   * Checkout.js receives the onClose prop from App.js,
+   * which points at the hideCartHandler function.
    */
 
   return (
@@ -62,13 +84,8 @@ const Cart = (props) => {
         <span>Total Amount</span>
         <span>{totalAmount}</span>
       </div>
-      <Checkout />
-      <div className={classes.actions}>
-        <button className={classes['button--alt']} onClick={props.onClose}>
-          Close
-        </button>
-        {hasItems && <button className={classes.button}>Order</button>}
-      </div>
+      {isCheckout && <Checkout onCancel={props.onClose} />}
+      {!isCheckout && modalActions}
     </Modal>
   );
 };
